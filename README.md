@@ -21,7 +21,7 @@ npm run test:backend
 
 ## Examples
 
-Frontend demo:
+Frontend demo (2-page IMDb app: list + details):
 
 ```bash
 npm run example:frontend
