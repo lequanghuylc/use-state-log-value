@@ -1,0 +1,39 @@
+{
+  "name": "use-state-log-value",
+  "version": "0.1.0",
+  "description": "State change logging utilities for frontend and backend",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "jest",
+    "test:frontend": "jest --selectProjects frontend",
+    "test:backend": "jest --selectProjects backend",
+    "example:frontend": "vite --config examples/frontend/vite.config.ts",
+    "example:backend": "tsx examples/backend/demo.ts",
+    "cypress:run": "cypress run",
+    "cypress:open": "cypress open"
+  },
+  "keywords": ["react", "hook", "state", "logging"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.10",
+    "@types/react": "^18.3.19",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "cypress": "^14.1.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "start-server-and-test": "^2.0.10",
+    "ts-jest": "^29.2.5",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0"
+  }
+}
