@@ -37,8 +37,12 @@ function logApiPlugin(): Plugin {
               const parsed = JSON.parse(body);
               logs.push({
                 message: String(parsed.message ?? ''),
-                meta: parsed.meta ?? {},
-                timestamp: new Date().toISOString(),
+                meta: {
+                  prev: parsed.prev,
+                  next: parsed.next,
+                  label: parsed.label,
+                },
+                timestamp: String(parsed.timestamp ?? new Date().toISOString()),
               });
               res.statusCode = 201;
               res.setHeader('Content-Type', 'application/json');

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import { useStateLogValue } from '../../../src/frontend/useStateLogValue';
+import { setLogServer, useStateLogValue } from '../../../src/frontend/useStateLogValue';
 
 type ImdbItem = {
   id: string;
@@ -47,22 +47,11 @@ const imdbData: ImdbItem[] = [
   },
 ];
 
-const apiLogger = async (message: string, meta: { prev: unknown; next: unknown; label?: string }) => {
-  await fetch('/api/logs', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, meta }),
-  });
-};
+setLogServer('/api/logs');
 
 function ListPage() {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useStateLogValue<'all' | 'movie' | 'tv'>('all', {
-    label: 'imdb-filter',
-    logger: (message, meta) => {
-      void apiLogger(message, meta);
-    },
-  });
+  const [selectedType, setSelectedType] = useStateLogValue<'all' | 'movie' | 'tv'>('all', 'imdb-filter');
 
   const visible = imdbData.filter((item) => selectedType === 'all' || item.type === selectedType);
 

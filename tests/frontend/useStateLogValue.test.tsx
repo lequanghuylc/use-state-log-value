@@ -1,9 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { useStateLogValue } from '../../src/frontend/useStateLogValue';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { setLogServer, useStateLogValue } from '../../src/frontend/useStateLogValue';
 
-function Counter({ logger }: { logger: any }) {
-  const [count, setCount] = useStateLogValue(0, { label: 'counter', logger });
+function Counter() {
+  const [count, setCount] = useStateLogValue(0, 'counter');
   return (
     <div>
       <span data-testid="count">{count}</span>
@@ -13,14 +13,18 @@ function Counter({ logger }: { logger: any }) {
 }
 
 describe('useStateLogValue', () => {
-  it('logs when value changes', () => {
-    const logger = jest.fn();
-    render(<Counter logger={logger} />);
+  it('logs when value changes to configured server', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true });
+    (global as any).fetch = fetchMock;
 
+    setLogServer('https://example.com');
+
+    render(<Counter />);
     fireEvent.click(screen.getByText('inc'));
 
-    expect(screen.getByTestId('count')).toHaveTextContent('1');
-    expect(logger).toHaveBeenCalledTimes(1);
-    expect(logger.mock.calls[0][1]).toMatchObject({ prev: 0, next: 1, label: 'counter' });
+    expect(screen.getByTestId('count').textContent).toBe('1');
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock.mock.calls[0][0]).toBe('https://example.com/ingest');
   });
 });
