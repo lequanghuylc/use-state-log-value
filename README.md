@@ -57,11 +57,18 @@ Start the local server:
 npx stateLogServer
 # optional
 npx stateLogServer --port 8787
+# help
+npx stateLogServer --help
 ```
 
 This writes logs to:
 
 - `./.log-values/backend-YYYY-MM-DD.log`
+
+### Environment variables
+
+- `STATE_LOG_SERVER_PORT`: default local server port if `--port` is not provided
+- `STATE_LOG_READ_DAYS`: number of rotated log days scanned by `GET /states` (default: `3`)
 
 ## Backend usage
 

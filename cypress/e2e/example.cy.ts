@@ -17,9 +17,9 @@ describe('use-state-log-value imdb demo', () => {
     cy.get('[data-cy="detail-title"]').should('contain.text', 'Breaking Bad');
     cy.wait(1000);
 
-    cy.get('[data-cy="logs-json"]').should('contain.text', 'imdb-filter');
+    cy.get('[data-cy="logs-json"]').should('contain.text', '"key": "imdb-filter"');
     cy.wait(1000);
-    cy.get('[data-cy="logs-json"]').should('contain.text', '"next": "tv"');
+    cy.get('[data-cy="logs-json"]').should('contain.text', '"value": "tv"');
     cy.wait(1000);
   });
 });
