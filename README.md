@@ -4,7 +4,7 @@ State logging for React with a clean one-line hook API, plus optional backend se
 
 ## Features
 
-- One-line `useState` replacement: `useStateLogValue(initialValue, label)`
+- Per-component state logging: `createUseState('ComponentName')` returns a `useState`-like hook that logs with that component name
 - Global logger config: `setLogServer('offline')` or `setLogServer('https://...')`
 - `offline` mode (dev only): sends logs to local `stateLogServer`
 - Generated local CLI binary: `./node_modules/.bin/stateLogServer`
@@ -13,6 +13,7 @@ State logging for React with a clean one-line hook API, plus optional backend se
 - Backend helper exports: `startServer(port)`, `setUpNotification(...)`
 - Optional Telegram notification for error logs
 - Jest tests + frontend demo + Cypress video flow
+- **Cursor rule**: on install, a rule file is copied to your project’s `.cursor/rules/` so Cursor can use the library correctly. If you use `--ignore-scripts` or the rule wasn’t installed, run: `npx use-state-log-value-install-rules`
 
 ## Install
 
@@ -22,12 +23,16 @@ npm install use-state-log-value
 
 ## Frontend usage
 
+Create a hook per component so logs are tagged with the correct component name:
+
 ```ts
-import { useStateLogValue, setLogServer } from 'use-state-log-value';
+import { createUseState, setLogServer } from 'use-state-log-value';
 
 setLogServer('offline');
 // or
 setLogServer('https://some-remote-server.com');
+
+const useStateLogValue = createUseState('Filters');
 ```
 
 ```tsx

@@ -1,0 +1,122 @@
+# use-state-log-value: State Logging for React
+
+This project uses the `use-state-log-value` library to log React state changes (e.g. to a local or remote server). Follow these guidelines when adding or changing state that should be logged.
+
+## Core principle
+
+**Create one hook per component** using `createUseState('ComponentName')` so logs are tagged with the correct component name. Do not use a shared/default hook with a generic name.
+
+## Setup
+
+1. **Configure the log server** (once, e.g. in app entry or a config module):
+
+```ts
+import { setLogServer } from 'use-state-log-value';
+
+// Development: send to local stateLogServer (writes to .log-values/)
+setLogServer('offline');
+
+// Or send to a remote ingest URL
+setLogServer('https://your-server.com');
+```
+
+2. **Create a hook per component** that needs logged state:
+
+```ts
+import { createUseState } from 'use-state-log-value';
+
+const useStateLogValue = createUseState('MyComponentName');
+```
+
+## Usage in components
+
+- Use the hook returned by `createUseState` exactly like `useState`: same API and typing.
+- **First argument:** initial value (same as `useState`).
+- **Second argument (optional):** label for this state in logs (default `'state'`). Use a short, stable id (e.g. `'imdb-filter'`, `'search-query'`) so you can identify it in the backend.
+
+```tsx
+const useStateLogValue = createUseState('Filters');
+
+function Filters() {
+  const [type, setType] = useStateLogValue<'all' | 'movie' | 'tv'>('all', 'imdb-filter');
+  const [query, setQuery] = useStateLogValue('', 'search-query');
+  // ...
+}
+```
+
+Prefer defining the hook once per file (module scope) when a single component uses it:
+
+```tsx
+import { createUseState } from 'use-state-log-value';
+
+const useStateLogValue = createUseState('ListPage');
+
+function ListPage() {
+  const [selectedType, setSelectedType] = useStateLogValue<'all' | 'movie' | 'tv'>('all', 'imdb-filter');
+  // ...
+}
+```
+
+## Rules
+
+1. **Always use `createUseState('ComponentName')`** — pass the actual component name (e.g. `'ListPage'`, `'Filters'`) so logs are identifiable.
+2. **One hook instance per component (or per file)** — create the hook at module scope or at the top of the component; don’t share one generic hook across many components.
+3. **Use a stable, descriptive label** for the second argument when you have multiple state values (e.g. `'imdb-filter'`, `'search-query'`).
+4. **Optional: run the local server in development** — `setLogServer('offline')` only works when the local server is running (e.g. `npx stateLogServer` or `./node_modules/.bin/stateLogServer`). Logs are written to `./.log-values/backend-YYYY-MM-DD.log`.
+
+## Examples
+
+### ✅ Good: Per-component hook with component name
+
+```tsx
+import { createUseState } from 'use-state-log-value';
+
+const useStateLogValue = createUseState('ListPage');
+
+function ListPage() {
+  const [selectedType, setSelectedType] = useStateLogValue<'all' | 'movie' | 'tv'>('all', 'imdb-filter');
+  return (/* ... */);
+}
+```
+
+### ✅ Good: Multiple state values with distinct labels
+
+```tsx
+const useStateLogValue = createUseState('Filters');
+
+function Filters() {
+  const [type, setType] = useStateLogValue<'all' | 'movie' | 'tv'>('all', 'imdb-filter');
+  const [query, setQuery] = useStateLogValue('', 'search-query');
+  // ...
+}
+```
+
+### ❌ Bad: Shared generic hook for many components
+
+```tsx
+// DON'T: one hook for the whole app — logs won't show which component changed
+const useStateLogValue = createUseState('App');
+
+function ListPage() {
+  const [x, setX] = useStateLogValue(0, 'x'); // componentName in logs will be "App"
+}
+```
+
+### ❌ Bad: Wrong or vague component name
+
+```tsx
+// DON'T: use a real component name, not a placeholder
+const useStateLogValue = createUseState('ReactComponent');
+```
+
+## Offline mode and backend
+
+- **Offline mode:** `setLogServer('offline')` sends to `http://127.0.0.1:<port>/ingest`. Port can be set via `STATE_LOG_SERVER_PORT` or `--port` for `stateLogServer`. Only active when `NODE_ENV=development`.
+- **Backend:** Optional backend package: `import { startServer, setUpNotification } from 'use-state-log-value/backend'` for custom servers and notifications (see package README).
+
+## Summary
+
+1. Use **`createUseState('ComponentName')`** and pass the real component name.
+2. Create **one hook per component** (or per file) and use it like `useState(initialValue, label)`.
+3. Call **`setLogServer('offline')`** or **`setLogServer(url)`** once at app startup.
+4. Use **short, stable labels** (second argument) when a component has multiple logged state values.

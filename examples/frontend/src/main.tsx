@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import { setLogServer, useStateLogValue } from '../../../src/frontend/useStateLogValue';
+import { createUseState, setLogServer } from '../../../src/frontend/useStateLogValue';
+
+const useStateLogValue = createUseState('ListPage');
 
 type ImdbItem = {
   id: string;
@@ -47,6 +49,7 @@ const imdbData: ImdbItem[] = [
   },
 ];
 
+// setLogServer('offline');
 setLogServer('/api/logs');
 
 function ListPage() {

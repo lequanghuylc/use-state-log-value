@@ -1,6 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { setLogServer, useStateLogValue } from '../../src/frontend/useStateLogValue';
+import { createUseState, setLogServer } from '../../src/frontend/useStateLogValue';
+
+const useStateLogValue = createUseState('Counter');
 
 function Counter() {
   const [count, setCount] = useStateLogValue(0, 'counter');

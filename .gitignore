@@ -4,3 +4,4 @@ coverage/
 .cypress-cache/
 cypress/videos/
 cypress/screenshots/
+.log-values

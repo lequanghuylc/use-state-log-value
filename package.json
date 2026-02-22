@@ -1,6 +1,6 @@
 {
   "name": "use-state-log-value",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "State change logging utilities for frontend and backend",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,20 +15,26 @@
     }
   },
   "bin": {
-    "stateLogServer": "dist/backend/cli.js"
+    "stateLogServer": "dist/backend/cli.js",
+    "use-state-log-value-install-rules": "scripts/postinstall.js"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "use-state-log-value.mdc",
+    "scripts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepublishOnly": "npm run build",
+    "postinstall": "node scripts/postinstall.js",
     "test": "jest",
     "test:frontend": "jest --selectProjects frontend",
     "test:backend": "jest --selectProjects backend",
     "example:frontend": "vite --config examples/frontend/vite.config.ts",
+    "example:todo": "cd examples/todo-frontend && npm install && npm run dev",
     "example:backend": "tsx examples/backend/demo.ts",
+    "server": "tsx src/backend/cli.ts",
     "cypress:run": "cypress run",
     "cypress:open": "cypress open"
   },

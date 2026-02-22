@@ -7,8 +7,10 @@ export function setLogServer(server: LogServerMode): void {
   logServer = server;
 }
 
-const isDev = (): boolean =>
-  typeof process !== 'undefined' && Boolean(process.env) && process.env.NODE_ENV === 'development';
+const isDev = (): boolean => {
+  if (typeof window !== 'undefined') return true;
+  return typeof process !== 'undefined' && Boolean(process.env) && process.env.NODE_ENV === 'development';
+};
 
 const stableStringify = (value: unknown): string => {
   const seen = new WeakSet<object>();
@@ -53,41 +55,47 @@ const getIngestUrl = (): string | null => {
   return logServer.endsWith('/ingest') ? logServer : `${logServer.replace(/\/+$/, '')}/ingest`;
 };
 
-export function useStateLogValue<T>(initialValue: T, label = 'state'): [T, Dispatch<SetStateAction<T>>] {
-  const [value, setValue] = useState<T>(initialValue);
-  const prevRef = useRef<T>(initialValue);
-  const lastHashRef = useRef<string>('');
+function createUseStateLogValue(componentName: string) {
+  return function useStateLogValue<T>(initialValue: T, label = 'state'): [T, Dispatch<SetStateAction<T>>] {
+    const [value, setValue] = useState<T>(initialValue);
+    const prevRef = useRef<T>(initialValue);
+    const lastHashRef = useRef<string>('');
 
-  useEffect(() => {
-    const prev = prevRef.current;
-    if (Object.is(prev, value)) return;
+    useEffect(() => {
+      const prev = prevRef.current;
+      if (Object.is(prev, value)) return;
 
-    const valueHash = stableStringify(value);
-    if (lastHashRef.current === valueHash) return;
+      const valueHash = stableStringify(value);
+      if (lastHashRef.current === valueHash) return;
 
-    const payload = {
-      componentName: 'ReactComponent',
-      key: label,
-      value,
-      valueHash,
-      isError: false,
-      meta: { prev },
-      clientTs: new Date().toISOString(),
-      source: 'frontend',
-    };
+      const payload = {
+        componentName,
+        key: label,
+        value,
+        valueHash,
+        isError: false,
+        meta: { prev },
+        clientTs: new Date().toISOString(),
+        source: 'frontend',
+      };
 
-    const url = getIngestUrl();
-    if (url) {
-      void fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      }).catch(() => undefined);
-    }
+      const url = getIngestUrl();
+      if (url) {
+        void fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(() => undefined);
+      }
 
-    prevRef.current = value;
-    lastHashRef.current = valueHash;
-  }, [value, label]);
+      prevRef.current = value;
+      lastHashRef.current = valueHash;
+    }, [value, label]);
 
-  return [value, setValue];
+    return [value, setValue];
+  };
+}
+
+export function createUseState(componentName: string) {
+  return createUseStateLogValue(componentName);
 }
